@@ -1,0 +1,109 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Short url challenge",
+        "version": "0.0.1"
+    },
+    "paths": {
+        "/api/url": {
+            "get": {
+                "summary": "Get shortened url list",
+                "operationId": "d6f6483a11ff5c8fc1676435ca531aaa",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "url_id": {
+                                                        "type": "string",
+                                                        "example": "wgxorbna"
+                                                    },
+                                                    "url": {
+                                                        "type": "string",
+                                                        "example": "https://swagger.io/"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "no data found"
+                    }
+                }
+            }
+        },
+        "/api/urls": {
+            "post": {
+                "summary": "Create shortened url",
+                "description": "Store a newly created resource in storage.",
+                "operationId": "d9f0a266ea62d6abd8c7aa4de8e7fd74",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "url"
+                                ],
+                                "properties": {
+                                    "url": {
+                                        "type": "url",
+                                        "example": "https://swagger.io/"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "success - no content"
+                    },
+                    "400": {
+                        "description": "bad request"
+                    }
+                }
+            }
+        },
+        "/api/url/{url_id}": {
+            "delete": {
+                "summary": "Delete url",
+                "description": "Remove the specified resource from storage.",
+                "operationId": "202fb3ae111b3447fe2d0a20fc5d52b9",
+                "parameters": [
+                    {
+                        "name": "url_id",
+                        "in": "path",
+                        "description": "url id to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "wqcoienr"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "404": {
+                        "description": "url not found"
+                    }
+                }
+            }
+        }
+    }
+}
