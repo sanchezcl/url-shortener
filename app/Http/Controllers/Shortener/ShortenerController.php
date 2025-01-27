@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Shortener;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUrlRequest;
 use App\Http\Resources\UrlCollection;
+use App\Http\Resources\UrlResource;
 use App\Models\Url;
 use App\Services\UrlServiceInterface;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use OpenApi\Annotations as OA;
@@ -58,9 +62,9 @@ class ShortenerController extends Controller
      *     @OA\Response(response=404,description="no data found"),
      * )
      */
-    public function index(): UrlCollection
+    public function index()
     {
-        return new UrlCollection(Url::paginate(10));
+        return UrlResource::collection(Url::latest()->get());
     }
 
     /**
@@ -94,7 +98,12 @@ class ShortenerController extends Controller
             $body = $request->validated();
             $url = new Url($body);
             $this->service->storeUrl($url);
-        } catch (\Exception $e) {
+        } catch (UniqueConstraintViolationException $e) {
+            $message = "url already exist";
+            Log::error($message);
+            return response()->json(['error' => $message], Response::HTTP_BAD_REQUEST);
+        }
+        catch (\Exception $e) {
             return response()->json(['status' => false, 'error' => $e->getMessage()], $e->getCode());
         }
         return response()->noContent();
@@ -107,7 +116,7 @@ class ShortenerController extends Controller
     {
         $redirectUrl = $this->service->getUrl($id);
         if ($redirectUrl == null) {
-            return abort(404);
+            return abort(Response::HTTP_NOT_FOUND);
         }
         return redirect()->away($redirectUrl->url);
     }
@@ -136,7 +145,7 @@ class ShortenerController extends Controller
     {
         $result = $this->service->deleteUrl($id);
         if (!$result) {
-            return abort(404);
+            return abort(Response::HTTP_NOT_FOUND);
         }
         return response()->noContent();
     }

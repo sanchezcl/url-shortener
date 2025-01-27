@@ -3,9 +3,6 @@
 use App\Http\Controllers\Shortener\ShortenerController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/u/{id}', [ShortenerController::class, 'redirect']);
 
-Route::get('/{id}', [ShortenerController::class, 'redirect']);
-
+Route::view('/{path?}', 'welcome')->where('path', '^(?!api).*$');;
